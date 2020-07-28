@@ -43,4 +43,5 @@ int readFile(char *fileName) //use this method in a suitable way to read file
 int main(int argc, char *argv[])
 {
     readFile(argv[1]);
+    //testing
 }
