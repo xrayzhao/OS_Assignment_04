@@ -17,6 +17,7 @@ int need[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES];
 int get_max(char *fileName);
 int request_resources(int customer_num, int request[]);
 void release_resources(int customer_num, int release[]);
+int safe_state(int customer_num, int available[], int request[]);
 
 
 int main(int argc, char *argv[])
@@ -84,3 +85,44 @@ int get_max(char *fileName){
     return 1;
 }
 
+
+
+int safe_state(int customer_num, int available[], int request[]){
+    //Handle the allocation task
+// If Request_i < Need_i,output unsafe
+    int SAFE_FLAG = 1;
+    int WAIT_FLAG = 0;
+    for (int i=0;i<NUMBER_OF_RESOURCES;i++)
+    {
+        if (request[i] > need[customer_num][i])
+        {
+            SAFE_FLAG = 0;
+            break;
+        }
+        else continue;
+    }
+    if (SAFE_FLAG == 0)
+    {
+        fprintf(stderr,"This request is unsafe, deniedr.\n");
+        return -1;
+    }
+
+    for (int i=0;i<NUMBER_OF_RESOURCES;i++)
+    {
+        printf("%d, %d \n",request[i],available[i]);
+        if (request[i] > available[i])
+        {
+            WAIT_FLAG = 1;
+            break;
+        }
+        else continue;
+    }
+    if (WAIT_FLAG == 1)
+    {
+        fprintf(stderr,"This request is unsafe, deniedx.\n");
+        return -1;
+    }
+
+    return 1;
+
+}
