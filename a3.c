@@ -85,7 +85,35 @@ int get_max(char *fileName){
     return 1;
 }
 
+int request_resources(int customer_num, int request[]){
 
+    // Try to change the situation
+    for (int i=0;i<NUMBER_OF_RESOURCES;i++)
+    {
+        available[i] -= request[i];
+        allocation[customer_num][i] += request[i];
+        need[customer_num][i] -= request[i];
+    }
+    int state = safe_state(customer_num, available,request);
+
+    if (state == -1)
+    {
+        // Roll back the result
+        // fprintf(stderr,"This request is unsafe, denied.\n");
+        for (int i=0;i<NUMBER_OF_RESOURCES;i++)
+
+        {
+            available[i] += request[i];
+            allocation[customer_num][i] -= request[i];
+            need[customer_num][i] += request[i];
+        }
+        return -1;
+    }
+    else
+    {
+        return 0;
+    }
+}
 
 int safe_state(int customer_num, int available[], int request[]){
     //Handle the allocation task
