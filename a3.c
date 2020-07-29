@@ -19,9 +19,10 @@ int request_resources(int customer_num, int request[]);
 void release_resources(int customer_num, int release[]);
 
 
-int main()
+int main(int argc, char *argv[])
 {
-    char *fileName = "/Users/rayzhao/VSCode/OS_Assignment_04/sample4_in.txt"; //File in
+    //char *fileName = "/Users/rayzhao/VSCode/OS_Assignment_04/sample4_in.txt"; //File in
+    char *fileName = argv[1];
     get_max(fileName);
 }
 
