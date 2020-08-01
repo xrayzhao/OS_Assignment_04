@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <pthread.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +12,7 @@ int available[NUMBER_OF_RESOURCES]; /* the available amount of each resource */
 int maximum[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES]; /*the maximum demand of each customer */
 int allocation[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES]; /* the amount currently allocated to each customer */
 int need[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES]; /* the remaining need of each customer */
+pthread_mutex_t m;
 
 int get_max(char *fileName); //read the txt file and enroll elements into maximum and need array
 int request_resources(int customer_num, int request[]); //request command is performed in here
@@ -21,7 +23,7 @@ int safe_state(int available[]); //checking the system is in safe state
 
 int main(int argc, char *argv[]) {
 
-    char *fileName = "/Users/rayzhao/CLionProjects/170152740_a04/sample4_in.txt"; //File in
+    char *fileName = "sample4_in.txt"; //File in
 
     //check for command line info
     if (argc < 2) {
@@ -38,7 +40,7 @@ int main(int argc, char *argv[]) {
 
     while (1) //Run the loop to ask command until an invalid command entered
     {
-        char command[10]; // input array
+        char command[10]; // input array+
         char c;
         int i = 0;
 
@@ -113,6 +115,61 @@ int main(int argc, char *argv[]) {
                 printf("%d ", available[i]);
                 }
                 printf("\n");
+        }
+        // if command begins with *, output the state of availabe, maximum, allocation, and need
+        else if (command[0] == '*'){
+            
+            int row, col;
+
+            //output available
+            printf("Available Array State\n");
+            for (row = 0; row < NUMBER_OF_RESOURCES; row++){
+                printf("%d ", available[row]);
+            }
+            //output max
+            printf("\n\nMaximum Array State\n");;
+            for (col = 0; col < NUMBER_OF_CUSTOMERS; col++){
+                for (row = 0; row < NUMBER_OF_RESOURCES; row++){
+                    printf("%d ", maximum[col][row]);
+                }
+                printf("\n");
+            }
+            //output allocation
+            printf("\nAllocation Array State\n");
+            for (col = 0; col < NUMBER_OF_CUSTOMERS; col++){
+                for (row = 0; row < NUMBER_OF_RESOURCES; row++){
+                    printf("%d ", allocation[col][row]);
+                }
+                printf("\n");
+            }
+            //output need
+            printf("\nNeed Array State\n");
+            for (col = 0; col < NUMBER_OF_CUSTOMERS; col++){
+                for (row = 0; row < NUMBER_OF_RESOURCES; row++){
+                    printf("%d ", need[col][row]);
+                }
+                printf("\n");
+            }
+        }
+
+        else if ((command[0] == 'R' && command[1] == 'u' && command[2] == 'n' )){
+
+    
+            pthread_mutex_init(&m, NULL);
+
+
+            //check the safe_state of available
+            int state = safe_state(available);
+            printf("\nthe safe state value is: %d\n",state);
+            if (state == -1){
+                printf("\nThe current state is NOT SAFE\n");
+            }else
+
+            //if Safe proceed
+            {
+                printf("\nThe current state is SAFE\n");
+            }
+
         }
             else {
 
@@ -216,7 +273,6 @@ int request_resources(int customer_num, int request[]) {
     }
 
 }
-
 
 void release_resources(int customer_num, int release[])
 {
