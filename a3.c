@@ -44,12 +44,17 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Error: available array info is missing\n");
         return -1;
     } else {
+        printf("Number of Customers: %d\n", NUMBER_OF_CUSTOMERS);
+        printf("Currently Available resources: ");
         //add command line info to available array
         for(int i = 1; i < NUMBER_OF_CUSTOMERS; i++){
             available[i-1] = atoi(argv[i]);
+            printf("%d ",available[i-1]);
         }
+        printf("\n");
     }
 
+    printf("Maximum resources from file:\n");
     get_max(fileName); //read sample4_in.txt
 
 
@@ -59,7 +64,7 @@ int main(int argc, char *argv[]) {
         char c;
         int i = 0;
         
-
+        printf("Enter Command: ");
         //adding input command into input array
         while ((c = getchar()) != '\n') {
             command[i] = c;
@@ -85,17 +90,6 @@ int main(int argc, char *argv[]) {
             if (request_resources(customer_num, require) == 0) {
                 printf("Request is satisfied.\n");
 
-                    //testing for now
-                    printf("%d Need: ", customer_num);
-                    for (int i = 0; i < NUMBER_OF_RESOURCES; i++) {
-                        printf("%d ", need[customer_num][i]);
-                    }
-                    printf("\n");
-                    printf("%d Available: ", customer_num);
-                    for (int i = 0; i < NUMBER_OF_RESOURCES; i++) {
-                    printf("%d ", available[i]);
-                }
-                printf("\n");
             } else {
                 fprintf(stderr, "Unsafe request! denied.\n");
             }
@@ -119,18 +113,6 @@ int main(int argc, char *argv[]) {
             /*call release_resources function, print result*/
             release_resources(customer_num, release);
 
-                //for testing
-                printf("%d Need: ", customer_num);
-                for (int i = 0; i < NUMBER_OF_RESOURCES; i++) {
-                    printf("%d ", need[customer_num][i]);
-                }
-                printf("\n");
-
-                printf("%d Available: ", customer_num);
-                for (int i = 0; i < NUMBER_OF_RESOURCES; i++) {
-                printf("%d ", available[i]);
-                }
-                printf("\n");
         }
         // if command begins with *, output the state of availabe, maximum, allocation, and need
         else if (command[0] == '*'){
