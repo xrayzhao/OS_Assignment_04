@@ -1,4 +1,4 @@
-//Created by Ray Zhou (170152740) and Colin Faught (170456730)
+//Created by Ray Zhao (170152740) and Colin Faught (170456730)
 //https://github.com/xrayzhao/OS_Assignment_04
 
 #include <stdio.h>
@@ -342,6 +342,7 @@ int request_resources(int customer_num, int request[]) {
 
 void release_resources(int customer_num, int release[])
 {
+    int flag = 1;
     for (int i=0;i<NUMBER_OF_RESOURCES;i++)
     {
         //performing logical bank's algorithm calculation for release
@@ -352,17 +353,24 @@ void release_resources(int customer_num, int release[])
         //if release more resource exceed customer needs, release_resources denied, return back to previous step
         if (allocation[customer_num][i] < 0)
         {
-            fprintf(stderr,"Invalid release! denied.\n");
-
-            //reverse the calculations
-            for (int j=0;j<i;j++)
-            {
-                available[i] -= release[i];
-                allocation[customer_num][i] += release[i];
-                need[customer_num][i] -= release[i];
-            }
-        }
+            flag = 0;
+        } 
     }
+    if (flag == 0){
+        //reverse the calculations
+        for (int j=0;j<NUMBER_OF_RESOURCES;j++)
+        {
+            available[j] -= release[j];
+            allocation[customer_num][j] += release[j];
+            need[customer_num][j] -= release[j];
+        }
+        fprintf(stderr,"Invalid release! denied.\n");
+        return;
+    }
+    
+    printf("Release is satisfied.\n");
+    return;
+
 }
 
 int initial_safe_check(int customer_num, int available[], int request[]) {
