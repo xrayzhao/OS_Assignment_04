@@ -1,4 +1,4 @@
-//Created by Ray Zhou (170152740) and Colin Faught (170456730)
+//Created by Ray Zhao (170152740) and Colin Faught (170456730)
 //https://github.com/xrayzhao/OS_Assignment_04
 
 #include <stdio.h>
