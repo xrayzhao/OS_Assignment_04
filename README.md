@@ -35,6 +35,7 @@ Step 4.
 
 
 ##Individual contribution 
+    
     Ray Zhao:
     -get_max function
     -request_resource function
