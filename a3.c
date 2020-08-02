@@ -3,27 +3,41 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define NUMBER_OF_CUSTOMERS 5 //number of customers in sample4_in.txt file
 #define NUMBER_OF_RESOURCES 4 //number of resources type for customer
 
+//used in Run command
 
 int available[NUMBER_OF_RESOURCES]; /* the available amount of each resource */
 int maximum[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES]; /*the maximum demand of each customer */
 int allocation[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES]; /* the amount currently allocated to each customer */
 int need[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES]; /* the remaining need of each customer */
-pthread_mutex_t m;
+int r;
+int toBeReleased;
+
 
 int get_max(char *fileName); //read the txt file and enroll elements into maximum and need array
 int request_resources(int customer_num, int request[]); //request command is performed in here
 void release_resources(int customer_num, int release[]); //release command is performed in here
 int initial_safe_check(int customer_num, int available[], int request[]); //use to first check the safe state of the system before run calculation
 int safe_state(int available[]); //checking the system is in safe state
+void runner(void *thread); //used to run the program with safe algorithm
+void *threadRunner(void *thread);
+int sequence[NUMBER_OF_CUSTOMERS];
+
+typedef struct thread //represents a single thread
+{
+    int customer;
+} Thread;
+
 
 
 int main(int argc, char *argv[]) {
 
     char *fileName = "sample4_in.txt"; //File in
+    pthread_t tid;
 
     //check for command line info
     if (argc < 2) {
@@ -38,11 +52,13 @@ int main(int argc, char *argv[]) {
 
     get_max(fileName); //read sample4_in.txt
 
+
     while (1) //Run the loop to ask command until an invalid command entered
     {
         char command[10]; // input array+
         char c;
         int i = 0;
+        
 
         //adding input command into input array
         while ((c = getchar()) != '\n') {
@@ -123,30 +139,30 @@ int main(int argc, char *argv[]) {
 
             //output available
             printf("Available Array State\n");
-            for (row = 0; row < NUMBER_OF_RESOURCES; row++){
-                printf("%d ", available[row]);
+            for (col = 0; col < NUMBER_OF_RESOURCES; col++){
+                printf("%d ", available[col]);
             }
             //output max
             printf("\n\nMaximum Array State\n");;
-            for (col = 0; col < NUMBER_OF_CUSTOMERS; col++){
-                for (row = 0; row < NUMBER_OF_RESOURCES; row++){
-                    printf("%d ", maximum[col][row]);
+            for (row = 0; row < NUMBER_OF_CUSTOMERS; row++){
+                for (col = 0; col < NUMBER_OF_RESOURCES; col++){
+                    printf("%d ", maximum[row][col]);
                 }
                 printf("\n");
             }
             //output allocation
             printf("\nAllocation Array State\n");
-            for (col = 0; col < NUMBER_OF_CUSTOMERS; col++){
-                for (row = 0; row < NUMBER_OF_RESOURCES; row++){
-                    printf("%d ", allocation[col][row]);
+            for (row = 0; row < NUMBER_OF_CUSTOMERS; row++){
+                for (col = 0; col < NUMBER_OF_RESOURCES; col++){
+                    printf("%d ", allocation[row][col]);
                 }
                 printf("\n");
             }
             //output need
             printf("\nNeed Array State\n");
-            for (col = 0; col < NUMBER_OF_CUSTOMERS; col++){
-                for (row = 0; row < NUMBER_OF_RESOURCES; row++){
-                    printf("%d ", need[col][row]);
+            for (row = 0; row < NUMBER_OF_CUSTOMERS; row++){
+                for (col = 0; col < NUMBER_OF_RESOURCES; col++){
+                    printf("%d ", need[row][col]);
                 }
                 printf("\n");
             }
@@ -154,20 +170,86 @@ int main(int argc, char *argv[]) {
 
         else if ((command[0] == 'R' && command[1] == 'u' && command[2] == 'n' )){
 
-    
-            pthread_mutex_init(&m, NULL);
-
-
             //check the safe_state of available
             int state = safe_state(available);
-            printf("\nthe safe state value is: %d\n",state);
             if (state == -1){
                 printf("\nThe current state is NOT SAFE\n");
             }else
 
-            //if Safe proceed
+            //if Safe proceed to next step
             {
                 printf("\nThe current state is SAFE\n");
+                
+                // Print the safe sequence of threads
+                printf("The safe sequence is: <");
+
+                for (int x = 0; x < NUMBER_OF_CUSTOMERS; x++) {
+                    
+                    //output the safe sequence
+                    if(x<(NUMBER_OF_CUSTOMERS-1))
+                    {
+                        printf("%d ", sequence[x]);
+                    }else
+                    {
+                        printf("%d", sequence[x]);
+                    }
+                }
+                printf(">\n");
+
+                //iterate through safe sequence
+                for (r = 0; r < NUMBER_OF_CUSTOMERS; r++) {
+                    
+                    Thread *thread;
+
+                    int request[NUMBER_OF_RESOURCES];
+                    int release[NUMBER_OF_RESOURCES];
+
+                    //uncomment to test sequences
+                        //printf("sequences:");
+                        //for (int c = 0; c < NUMBER_OF_CUSTOMERS; c++) {
+                        //    printf(" %d", sequence[c]);
+                        // }
+
+                    printf("\n\n-->Customer/Thread %d", sequence[r]);
+                    
+                    //output allocated
+                    printf("\n      Allocated resources:   ");
+                    for (int c = 0; c < NUMBER_OF_RESOURCES; c++) {
+                        printf(" %d", allocation[sequence[r]][c]);
+                    }
+                    
+                    //output need
+                    printf("\n      Needed:   ");
+                    for (int c = 0; c < NUMBER_OF_RESOURCES; c++) {
+                        printf(" %d", need[sequence[r]][c]);
+                    }
+
+                    //output avaiable
+                    printf("\n      Available:  ");
+                    for (int c = 0; c < NUMBER_OF_RESOURCES; c++) {
+                        printf(" %d", available[c]);
+                    }
+                    printf("\n");
+
+                    pthread_t tid;
+
+                    //create thread
+				    pthread_create(&tid, NULL, &threadRunner, thread + r);
+
+                    //join the threads
+                    pthread_join(tid, NULL);
+
+                    
+                                    //release_resources(sequence[r],allocation[sequence[r]]);
+                    
+                    //now that the threads have run, output the new avaiable resources
+                    printf("      New Available:  ");
+                    for (int c = 0; c < NUMBER_OF_RESOURCES; c++) {
+                        printf(" %d", available[c]);
+                    }
+                    printf("\n");
+                }
+
             }
 
         }
@@ -178,7 +260,6 @@ int main(int argc, char *argv[]) {
     }
 
 }
-
 
 int get_max(char *fileName) {
 
@@ -318,6 +399,12 @@ int safe_state(int available[]){
 
     int work[NUMBER_OF_RESOURCES]; //request worked
     int finish[NUMBER_OF_CUSTOMERS]; //contains a list of state results
+    int count = -1;
+    
+    //reset sequence
+    for (int i = 0; i<NUMBER_OF_RESOURCES;i++){
+        sequence[i] = count;
+    }
 
     //signs available array to the work array
     for (int i = 0; i<NUMBER_OF_RESOURCES;i++){
@@ -346,7 +433,8 @@ int safe_state(int available[]){
                 //if j went over all resources
                 if (j == NUMBER_OF_RESOURCES - 1){
                     finish[k] = 1; //switch finish to true
-
+                    count++;
+                    sequence[count] = k;
                     for(j = 0;j < NUMBER_OF_RESOURCES;j++){
                         work[j] += allocation[k][j];
                         //printf("%d %d %d %d\n",work[j],allocation[k][j],j,k);
@@ -366,4 +454,32 @@ int safe_state(int available[]){
     return 1;
 }
 
+//adapted from Assignment 2
+void *threadRunner(void *thread)
+{
+
+	printf("      Thread has started\n");
+    
+                //printf("\n%d\n",sequence[r]);
+                //request_resources(sequence[r],need[sequence[r]]);  
+                //request_resources(sequence[r],request);
+    //delay
+    sleep(1);
+
+	printf("      Thread has finished\n");
+
+    //delay
+	sleep(1);
+    
+	printf("      Thread is releasing resources\n");
+    
+
+    //releases resources
+    release_resources(sequence[r],allocation[sequence[r]]);
+                    //release_resources(sequence[r],release);
+
+    //exit thread
+	pthread_exit(0);
+
+}
 
