@@ -4,37 +4,41 @@
 Completed to fulfill assignment requirements in Operating Systems university course. 
 
 
-##Installation 
+## Installation 
 
 To use the project, please follow the below steps:
 Step 1.
     Clone the github repository
-    ```git clone https://github.com/xrayzhao/OS_Assignment_04
-    git clone 
-    ```
+    ```git 
+
+    git clone https://github.com/xrayzhao/OS_Assignment_04
+    
 Step 2.
     Open the project in preffered IDE. If you are running on Windows, using a VM is recommended. 
-    [VirtualBox Website](https://www.virtualbox.org/)
-    [OSC10e download](https://www.os-book.com/OS10/VM/OSC10e.ova)
+[VirtualBox Website](https://www.virtualbox.org/),
+[OSC10e download](https://www.os-book.com/OS10/VM/OSC10e.ova)
 
 Step 3.
     Compile using gcc:
-    ```c
+   
+    
     gcc 170152740_170456730_a04.c -pthread
-    ```
-Step 4.
-    Run the code with input
-    ```c
-    ./a.out # # # #
-    ```
-    replace the # with the Max Resource you wish to allocate to each Customer/Thread
     
 
-##Screenshots 
+Step 4.
+    Run the code with input
+    
+    ./a.out # # # #
+
+
+replace the # with the Max Resource amount you wish to assign to each Customer/Thread
+    
+
+## Screenshots 
 
 
 
-##Individual contribution 
+## Individual contribution 
     
     Ray Zhao:
     -get_max function
@@ -54,23 +58,22 @@ Step 4.
     -output formatting
     -README File text
 
-##Tests 
+## Tests 
 
 
 
-##Code Example 
+## Code Example 
 
 
 
-##Authors 
-Ray Zhao
-Colin Faught
+## Authors 
+Ray Zhao, Colin Faught
 
-##Credits 
+## Credits 
 Operating System Concepts Ed.10
 
 
-##License (MIT)
+## License (MIT)
 Copyright (c) 2020 Ray Zhao, Colin Faught
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
