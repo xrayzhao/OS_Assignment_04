@@ -1,6 +1,3 @@
-//Created by Ray Zhao (170152740) and Colin Faught (170456730)
-//https://github.com/xrayzhao/OS_Assignment_04
-
 #include <stdio.h>
 #include <pthread.h>
 #include <sys/stat.h>
@@ -30,11 +27,11 @@ void runner(void *thread); //used to run the program with safe algorithm
 void *threadRunner(void *thread);
 int sequence[NUMBER_OF_CUSTOMERS];
 
-typedef struct thread 
+typedef struct thread //represents a single thread
 {
     int customer;
-    int id;
 } Thread;
+
 
 
 int main(int argc, char *argv[]) {
@@ -463,7 +460,7 @@ void *threadRunner(void *thread)
 
     //delay
 	sleep(1);
-
+    
 	printf("      Thread is releasing resources\n");
     
 
